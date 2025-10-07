@@ -1,47 +1,64 @@
 package com.group4.taobaoclon
 
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.group4.taobaoclon.ui.theme.TaobaoCloneTheme
+import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var productRecyclerView: RecyclerView
+    private lateinit var adapter: ProductAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            TaobaoCloneTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContentView(R.layout.activity_main)
+
+        productRecyclerView = findViewById(R.id.productRecyclerView)
+        productRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        lifecycleScope.launch {
+            fetchProductsAndRecommendations()
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private suspend fun fetchProductsAndRecommendations() {
+        try {
+            val productList = ApiClient.productApiService.getProducts()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TaobaoCloneTheme {
-        Greeting("Android")
+            adapter = ProductAdapter(productList) { product ->
+                // Create an Intent to open ProductDetailActivity
+                val intent = Intent(this, ProductDetailActivity::class.java)
+
+                // Pass the ID of the clicked product to the new activity
+                intent.putExtra("PRODUCT_ID", product.id)
+
+                // Start the new activity
+                startActivity(intent)
+            }
+            productRecyclerView.adapter = adapter
+
+            if (productList.isNotEmpty()) {
+                val firstProductId = productList[0].id
+                fetchRecommendations(firstProductId)
+            }
+
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error fetching products: ${e.message}")
+        }
+    }
+
+    private suspend fun fetchRecommendations(productId: Int) {
+        try {
+            val recommendedProducts = ApiClient.recommendationApiService.getRecommendations(productId)
+            Log.d("MainActivity", "Recommendations for product $productId: $recommendedProducts")
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error fetching recommendations: ${e.message}")
+        }
     }
 }
