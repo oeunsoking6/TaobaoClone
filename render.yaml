@@ -1,0 +1,43 @@
+services:
+  # A PostgreSQL database
+  - name: taobao-database
+    type: psql
+    psqlVersion: 14
+
+  # The User Service
+  - name: user-service
+    type: web
+    runtime: docker
+    repo: https://github.com/oeunsoking6/TaobaoClone # Your repo URL
+    rootDir: ./backend/user-service
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taobao-database
+          property: internalDatabaseUrl
+      - key: JWT_SECRET
+        sync: false # Keep your secret private
+
+  # The Product Service
+  - name: product-service
+    type: web
+    runtime: docker
+    repo: https://github.com/oeunsoking6/TaobaoClone
+    rootDir: ./backend/product-service
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taobao-database
+          property: internalDatabaseUrl
+
+  # The Recommendation Service
+  - name: recommendation-service
+    type: web
+    runtime: docker
+    repo: https://github.com/oeunsoking6/TaobaoClone
+    rootDir: ./backend/recommendation-service
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taobao-database
+          property: internalDatabaseUrl

@@ -1,5 +1,6 @@
 package com.group4.taobaoclon
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,20 +25,27 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                // Launch a coroutine to make the network call
                 lifecycleScope.launch {
                     try {
                         val request = LoginRequest(email, password)
                         val response = ApiClient.userApiService.login(request)
 
-                        if (response.isSuccessful) {
-                            Log.d("LoginActivity", "Login successful. Token: ${response.body()?.token}")
+                        if (response.isSuccessful && response.body() != null) {
+                            val token = response.body()!!.token
+                            Log.d("LoginActivity", "Login successful. Token: $token")
+
+                            // --- NEW CODE: SAVE THE TOKEN ---
+                            val sharedPrefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+                            with(sharedPrefs.edit()) {
+                                putString("USER_TOKEN", token)
+                                apply()
+                            }
+
                             Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
 
-                            // Navigate to the MainActivity
                             val intent = Intent(this@LoginActivity, MainActivity::class.java)
                             startActivity(intent)
-                            finish() // Close the login screen
+                            finish()
                         } else {
                             Log.e("LoginActivity", "Login failed: ${response.errorBody()?.string()}")
                             Toast.makeText(this@LoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
