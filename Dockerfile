@@ -1,20 +1,25 @@
-# Use an official lightweight Node.js runtime as a parent image
-FROM node:18-slim
+# This Dockerfile uses multi-stage builds to handle different services
 
-# Set the working directory in the container to /app
+# --- Build stage for user-service ---
+FROM node:18-slim AS user-service-build
 WORKDIR /app
-
-# Copy package.json and package-lock.json from the user-service subfolder
 COPY backend/user-service/package*.json ./
-
-# Install any needed packages
 RUN npm install
-
-# Copy the rest of the application code from the user-service subfolder
 COPY backend/user-service/ .
+CMD [ "node", "index.js" ]
 
-# Make port 8080 available to the world outside this container
-EXPOSE 8080
+# --- Build stage for product-service ---
+FROM node:18-slim AS product-service-build
+WORKDIR /app
+COPY backend/product-service/package*.json ./
+RUN npm install
+COPY backend/product-service/ .
+CMD [ "node", "index.js" ]
 
-# Define the command to run your app
+# --- Build stage for recommendation-service ---
+FROM node:18-slim AS recommendation-service-build
+WORKDIR /app
+COPY backend/recommendation-service/package*.json ./
+RUN npm install
+COPY backend/recommendation-service/ .
 CMD [ "node", "index.js" ]
