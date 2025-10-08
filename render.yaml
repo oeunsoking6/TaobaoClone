@@ -13,7 +13,7 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: taobao-database
-          property: internalDatabaseUrl
+          property: connectionString
       - key: JWT_SECRET
         sync: false
 
@@ -27,7 +27,7 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: taobao-database
-          property: internalDatabaseUrl
+          property: connectionString
 
   # The Recommendation Service
   - name: recommendation-service
@@ -39,4 +39,4 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: taobao-database
-          property: internalDatabaseUrl
+          property: connectionString
