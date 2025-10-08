@@ -1,7 +1,7 @@
 services:
   # A PostgreSQL database
   - name: taobao-database
-    type: psql
+    type: psql_db
     psqlVersion: 14
 
   # The User Service
