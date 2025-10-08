@@ -1,14 +1,13 @@
-services:
-  # A PostgreSQL database
+databases:
   - name: taobao-database
-    type: psql_db
-    psqlVersion: 14
+    plan: free
 
+services:
   # The User Service
   - name: user-service
     type: web
     runtime: docker
-    repo: https://github.com/oeunsoking6/TaobaoClone # Your repo URL
+    repo: https://github.com/oeunsoking6/TaobaoClone
     rootDir: ./backend/user-service
     envVars:
       - key: DATABASE_URL
@@ -16,7 +15,7 @@ services:
           name: taobao-database
           property: internalDatabaseUrl
       - key: JWT_SECRET
-        sync: false # Keep your secret private
+        sync: false
 
   # The Product Service
   - name: product-service
