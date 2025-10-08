@@ -23,7 +23,8 @@ class ProductDetailActivity : AppCompatActivity() {
             // Launch a coroutine to fetch the product details
             lifecycleScope.launch {
                 try {
-                    val product = ApiClient.productApiService.getProductById(productId)
+                    // Corrected function name here
+                    val product = ApiClient.productApiService.  getProductById(productId)
 
                     // Update the UI with the product details
                     nameTextView.text = product.name

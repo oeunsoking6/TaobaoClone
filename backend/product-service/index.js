@@ -1,19 +1,17 @@
-// index.js for product-service
 const express = require('express');
 const { Pool } = require('pg');
 
 const app = express();
-const PORT = 8081;
+const PORT = process.env.PORT || 8081; // Let Render set the port
 
 app.use(express.json());
 
-// Database Connection
+// Use the DATABASE_URL from environment variables
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'mysecretpassword',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Endpoint to get ALL products
@@ -27,7 +25,6 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// --- NEW ENDPOINT ---
 // Endpoint to get a SINGLE product by its ID
 app.get('/products/:id', async (req, res) => {
     try {
@@ -45,7 +42,6 @@ app.get('/products/:id', async (req, res) => {
     }
 });
 
-
 app.listen(PORT, () => {
-  console.log(`Product service listening on http://localhost:${PORT}`);
+  console.log(`Product service listening on port ${PORT}`);
 });
