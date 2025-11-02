@@ -30,4 +30,12 @@
         android:layout_marginTop="32dp"
         android:text="Add to Cart" />
 
+    <Button
+        android:id="@+id/viewHistoryButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="View Product History" />
+
 </LinearLayout>
