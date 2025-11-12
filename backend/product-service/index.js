@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -10,7 +9,6 @@ app.use(express.json());
 
 // --- Database Connection ---
 const connection = mongoose.createConnection(process.env.DATABASE_URL);
-autoIncrement.initialize(connection); // Initialize auto-increment
 
 connection.once('open', () => {
   console.log('Successfully connected to MongoDB');
@@ -23,18 +21,10 @@ connection.on('error', (err) => {
 
 // --- Mongoose Schema ---
 const ProductSchema = new mongoose.Schema({
+  id: { type: Number, unique: true }, // The product ID our app uses
   name: String,
   price: Number,
   seller: String,
-});
-
-// Add the auto-increment plugin to the schema
-// This will create a numeric 'id' field
-ProductSchema.plugin(autoIncrement.plugin, {
-  model: 'Product',
-  field: 'id', // This is the field our Android app expects
-  startAt: 1,
-  incrementBy: 1,
 });
 
 const Product = connection.model('Product', ProductSchema);
@@ -73,16 +63,16 @@ app.listen(PORT, () => {
 });
 
 // --- Database Seeding Function ---
-// This will add your sample products to the empty database
+// This will add your sample products with manual IDs
 async function seedDatabase() {
   try {
     const count = await Product.countDocuments();
     if (count === 0) {
       console.log('No products found. Seeding database...');
       const sampleProducts = [
-        { name: 'Cloud Smartphone X', price: 799.99, seller: 'ElectroCorp' },
-        { name: 'Cloud Wireless Earbuds', price: 129.99, seller: 'AudioPhile' },
-        { name: 'Cloud Smartwatch Series 5', price: 249.99, seller: 'TechGear' },
+        { id: 1, name: 'Cloud Smartphone X', price: 799.99, seller: 'ElectroCorp' },
+        { id: 2, name: 'Cloud Wireless Earbuds', price: 129.99, seller: 'AudioPhile' },
+        { id: 3, name: 'Cloud Smartwatch Series 5', price: 249.99, seller: 'TechGear' },
       ];
       await Product.create(sampleProducts);
       console.log('Database seeded successfully.');
