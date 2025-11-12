@@ -1,25 +1,38 @@
 require('dotenv').config();
 const express = require('express');
-const { Pool } = require('pg');
+const mongoose = require('mongoose'); // Import Mongoose
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 8080; // Render provides the PORT variable
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 
 // --- Database Connection ---
-// Use the DATABASE_URL from environment variables for cloud deployment
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+mongoose.connect(process.env.DATABASE_URL)
+  .then(() => console.log('Successfully connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB', err));
+
+// --- Mongoose Schema (replaces CREATE TABLE) ---
+const UserSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
+  password_hash: {
+    type: String,
+    required: true,
+  },
+  created_at: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-pool.query('SELECT NOW()', (err) => {
-  if (err) console.error('Error connecting to the database', err.stack);
-  else console.log('Successfully connected to the database');
-});
+const User = mongoose.model('User', UserSchema);
 
 // --- API Endpoints ---
 
@@ -29,17 +42,29 @@ app.post('/register', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email and password are required.' });
 
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Email already in use.' });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    const newUser = await pool.query(
-      "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email",
-      [email, passwordHash]
-    );
+    // Create a new user with the Mongoose model
+    const newUser = new User({
+      email: email,
+      password_hash: passwordHash,
+    });
 
-    res.status(201).json({ message: 'User registered successfully!', user: newUser.rows[0] });
+    // Save the new user to the database
+    const savedUser = await newUser.save();
+
+    res.status(201).json({ 
+      message: 'User registered successfully!', 
+      user: { id: savedUser._id, email: savedUser.email } 
+    });
   } catch (err) {
-    if (err.code === '23505') return res.status(409).json({ message: 'Email already in use.' });
     console.error(err.message);
     res.status(500).send('Server error');
   }
@@ -52,11 +77,10 @@ app.post('/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ message: 'Email and password are required.' });
 
     // 1. Find user in database
-    const userResult = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (userResult.rows.length === 0) {
+    const user = await User.findOne({ email: email });
+    if (!user) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
-    const user = userResult.rows[0];
 
     // 2. Compare submitted password with stored hash
     const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -65,11 +89,11 @@ app.post('/login', async (req, res) => {
     }
 
     // 3. Create and sign a JWT
-    const payload = { user: { id: user.id } };
+    const payload = { user: { id: user._id } };
     const token = jwt.sign(
       payload,
-      process.env.JWT_SECRET, // Get secret from .env file
-      { expiresIn: '1h' } // Token expires in 1 hour
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
     );
 
     // 4. Send token back to client
