@@ -1,6 +1,7 @@
 package com.group4.taobaoclon
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -20,10 +21,12 @@ class ProductDetailActivity : AppCompatActivity() {
         val nameTextView = findViewById<TextView>(R.id.detailProductNameTextView)
         val priceTextView = findViewById<TextView>(R.id.detailProductPriceTextView)
         val addToCartButton = findViewById<Button>(R.id.addToCartButton)
+        val viewHistoryButton = findViewById<Button>(R.id.viewHistoryButton) // Get the new button
 
         currentProductId = intent.getIntExtra("PRODUCT_ID", -1)
 
         if (currentProductId != -1) {
+            // Fetch and display product details
             lifecycleScope.launch {
                 try {
                     val product = ApiClient.productApiService.getProductById(currentProductId)
@@ -38,9 +41,8 @@ class ProductDetailActivity : AppCompatActivity() {
             nameTextView.text = "Product ID not found"
         }
 
-        // --- NEW CODE: ADD TO CART BUTTON LOGIC ---
+        // Add to Cart button logic
         addToCartButton.setOnClickListener {
-            // Read the saved token
             val sharedPrefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
             val token = sharedPrefs.getString("USER_TOKEN", null)
 
@@ -49,12 +51,11 @@ class ProductDetailActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Make the API call
             lifecycleScope.launch {
                 try {
                     val request = AddToCartRequest(productId = currentProductId, quantity = 1)
+                    // Make sure your cart service is deployed and this URL is correct
                     val response = ApiClient.cartApiService.addToCart("Bearer $token", request)
-
                     if (response.isSuccessful) {
                         Toast.makeText(this@ProductDetailActivity, "Added to cart!", Toast.LENGTH_SHORT).show()
                     } else {
@@ -65,6 +66,13 @@ class ProductDetailActivity : AppCompatActivity() {
                     Toast.makeText(this@ProductDetailActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        // --- NEW CODE: VIEW HISTORY BUTTON LOGIC ---
+        viewHistoryButton.setOnClickListener {
+            val intent = Intent(this, HistoryActivity::class.java)
+            intent.putExtra("PRODUCT_ID", currentProductId)
+            startActivity(intent)
         }
     }
 }
