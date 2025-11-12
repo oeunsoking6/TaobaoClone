@@ -9,7 +9,7 @@ app.use(express.json());
 
 // --- Mongoose Schema ---
 const ProductSchema = new mongoose.Schema({
-  id: { type: Number, unique: true }, 
+  id: { type: Number, unique: true }, // The product ID our app uses
   name: String,
   price: Number,
   seller: String,
@@ -61,18 +61,13 @@ async function seedDatabase() {
   }
 }
 
-// --- Database Connection (THE FIX) ---
+// --- Database Connection (Fixed) ---
 console.log("Connecting to MongoDB...");
-mongoose.connect(process.env.DATABASE_URL);
-const connection = mongoose.connection;
-connection.on('error', (err) => {
-  console.error('Error connecting to MongoDB', err);
-});
-connection.once('open', () => {
-  console.log('Successfully connected to MongoDB');
-  seedDatabase();
-  // Start listening for requests
-  app.listen(PORT, () => {
-    console.log(`Product service listening on port ${PORT}`);
-  });
-});
+mongoose.connect(process.env.DATABASE_URL)
+  .then(() => {
+    console.log('Successfully connected to MongoDB');
+    seedDatabase(); // Run the seeder function
+    // Start listening for requests
+    app.listen(PORT, () => console.log(`Product service listening on port ${PORT}`));
+  })
+  .catch(err => console.error('Error connecting to MongoDB', err));
