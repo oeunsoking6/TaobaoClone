@@ -1,18 +1,23 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment'); // We'll initialize this differently
 
 const app = express();
 const PORT = process.env.PORT || 8081;
 
 app.use(express.json());
 
-// --- Database Connection ---
-const connection = mongoose.createConnection(process.env.DATABASE_URL);
+// --- Database Connection (THE FIX) ---
+// 1. Use mongoose.connect() to establish the default connection
+mongoose.connect(process.env.DATABASE_URL);
+const connection = mongoose.connection; // 2. Get the default connection
+
+// 3. Initialize auto-increment on the default connection
+autoIncrement.initialize(connection); 
 
 connection.once('open', () => {
   console.log('Successfully connected to MongoDB');
-  // Seed the database after connecting
   seedDatabase();
 });
 connection.on('error', (err) => {
@@ -21,15 +26,24 @@ connection.on('error', (err) => {
 
 // --- Mongoose Schema ---
 const ProductSchema = new mongoose.Schema({
-  id: { type: Number, unique: true }, // The product ID our app uses
+  id: { type: Number, unique: true },
   name: String,
   price: Number,
   seller: String,
 });
 
-const Product = connection.model('Product', ProductSchema);
+// 4. Attach the plugin to the schema
+ProductSchema.plugin(autoIncrement.plugin, {
+  model: 'Product',
+  field: 'id',
+  startAt: 1,
+  incrementBy: 1,
+});
 
-// --- API Endpoints ---
+// 5. Use the default connection to create the model
+const Product = mongoose.model('Product', ProductSchema); 
+
+// --- API Endpoints (No changes from here down) ---
 
 // Endpoint to get ALL products
 app.get('/products', async (req, res) => {
@@ -46,7 +60,7 @@ app.get('/products', async (req, res) => {
 app.get('/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findOne({ id: id }); // Find by our numeric 'id'
+    const product = await Product.findOne({ id: id }); 
 
     if (!product) {
       return res.status(404).json({ msg: 'Product not found' });
@@ -62,8 +76,7 @@ app.listen(PORT, () => {
   console.log(`Product service listening on port ${PORT}`);
 });
 
-// --- Database Seeding Function ---
-// This will add your sample products with manual IDs
+// --- Database Seeding Function (No changes) ---
 async function seedDatabase() {
   try {
     const count = await Product.countDocuments();
