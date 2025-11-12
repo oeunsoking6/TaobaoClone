@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView // <-- Import TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -19,8 +20,10 @@ class LoginActivity : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
+        val registerTextView = findViewById<TextView>(R.id.registerTextView) // <-- NEW
 
         loginButton.setOnClickListener {
+            // ... (your existing login code remains here)
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
 
@@ -34,7 +37,6 @@ class LoginActivity : AppCompatActivity() {
                             val token = response.body()!!.token
                             Log.d("LoginActivity", "Login successful. Token: $token")
 
-                            // --- NEW CODE: SAVE THE TOKEN ---
                             val sharedPrefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
                             with(sharedPrefs.edit()) {
                                 putString("USER_TOKEN", token)
@@ -58,6 +60,12 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // --- NEW CLICK LISTENER ---
+        registerTextView.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 }

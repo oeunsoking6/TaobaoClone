@@ -1,20 +1,16 @@
-require('dotenv').config();
+require('dotenv').config(); // <-- Added
 const express = require('express');
-const mongoose = require('mongoose');
-const autoIncrement = require('mongoose-auto-increment'); // We'll initialize this differently
+const mongoose = require('mongoose'); // <-- Only mongoose
 
 const app = express();
 const PORT = process.env.PORT || 8082;
 
 app.use(express.json());
 
-// --- Database Connection (THE FIX) ---
+// --- Database Connection (Fixed) ---
 // 1. Use mongoose.connect()
 mongoose.connect(process.env.DATABASE_URL);
 const connection = mongoose.connection; // 2. Get the default connection
-
-// 3. Initialize auto-increment on the default connection
-autoIncrement.initialize(connection); 
 
 connection.once('open', () => {
   console.log('Successfully connected to MongoDB');
@@ -23,26 +19,18 @@ connection.on('error', (err) => {
   console.error('Error connecting to MongoDB', err);
 });
 
-// --- Mongoose Schema ---
+// --- Mongoose Schema (Fixed) ---
 const ProductSchema = new mongoose.Schema({
-  id: { type: Number, unique: true },
+  id: Number,
   name: String,
   price: Number,
   seller: String,
 });
 
-// 4. Attach the plugin to the schema
-ProductSchema.plugin(autoIncrement.plugin, {
-  model: 'Product',
-  field: 'id',
-  startAt: 1,
-  incrementBy: 1,
-});
+// 5. Use the default mongoose connection and tell it to use the "products" collection
+const Product = mongoose.model('Product', ProductSchema, 'products'); 
 
-// 5. Use the default mongoose connection
-const Product = mongoose.model('Product', ProductSchema); 
-
-// --- API Endpoint for Recommendations (No changes from here down) ---
+// --- API Endpoint for Recommendations (No changes) ---
 app.get('/recommendations/:productId', async (req, res) => {
   try {
     const productId = parseInt(req.params.productId);

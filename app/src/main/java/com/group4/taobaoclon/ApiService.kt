@@ -13,12 +13,8 @@ import retrofit2.http.Path
 data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val token: String)
 data class AddToCartRequest(val productId: Int, val quantity: Int)
-
-// New data class for a history event
-data class HistoryEvent(
-    val timestamp: Long,
-    val description: String
-)
+data class HistoryEvent(val timestamp: Long, val description: String)
+data class RegisterRequest(val email: String, val password: String) // <-- NEW CLASS
 
 // --- LIVE RENDER URLS ---
 // Make sure these URLs are correct for your Render services
@@ -40,6 +36,9 @@ interface ApiService {
     // --- User Service ---
     @POST("login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+
+    @POST("register") // <-- NEW FUNCTION
+    suspend fun register(@Body request: RegisterRequest): Response<Unit>
 
     // --- Product Service ---
     @GET("products")
