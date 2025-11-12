@@ -1,39 +1,22 @@
-require('dotenv').config(); // <-- Added
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose'); // <-- Only mongoose
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 8081;
 
 app.use(express.json());
 
-// --- Database Connection (Fixed) ---
-// 1. Use mongoose.connect() to establish the default connection
-mongoose.connect(process.env.DATABASE_URL);
-const connection = mongoose.connection; // 2. Get the default connection
-
-connection.once('open', () => {
-  console.log('Successfully connected to MongoDB');
-  seedDatabase();
-});
-connection.on('error', (err) => {
-  console.error('Error connecting to MongoDB', err);
-});
-
-// --- Mongoose Schema (Fixed) ---
+// --- Mongoose Schema ---
 const ProductSchema = new mongoose.Schema({
-  id: { type: Number, unique: true }, // The product ID our app uses
+  id: { type: Number, unique: true }, 
   name: String,
   price: Number,
   seller: String,
 });
-
-// 5. Use the default connection to create the model
 const Product = mongoose.model('Product', ProductSchema); 
 
-// --- API Endpoints (No changes) ---
-
-// Endpoint to get ALL products
+// --- API Endpoints ---
 app.get('/products', async (req, res) => {
   try {
     const allProducts = await Product.find();
@@ -43,13 +26,10 @@ app.get('/products', async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
-// Endpoint to get a SINGLE product by its ID
 app.get('/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const product = await Product.findOne({ id: id }); 
-
     if (!product) {
       return res.status(404).json({ msg: 'Product not found' });
     }
@@ -60,12 +40,7 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Product service listening on port ${PORT}`);
-});
-
-// --- Database Seeding Function (Fixed) ---
-// This will add your sample products with manual IDs
+// --- Database Seeding Function ---
 async function seedDatabase() {
   try {
     const count = await Product.countDocuments();
@@ -85,3 +60,19 @@ async function seedDatabase() {
     console.error('Error seeding database:', err.message);
   }
 }
+
+// --- Database Connection (THE FIX) ---
+console.log("Connecting to MongoDB...");
+mongoose.connect(process.env.DATABASE_URL);
+const connection = mongoose.connection;
+connection.on('error', (err) => {
+  console.error('Error connecting to MongoDB', err);
+});
+connection.once('open', () => {
+  console.log('Successfully connected to MongoDB');
+  seedDatabase();
+  // Start listening for requests
+  app.listen(PORT, () => {
+    console.log(`Product service listening on port ${PORT}`);
+  });
+});
