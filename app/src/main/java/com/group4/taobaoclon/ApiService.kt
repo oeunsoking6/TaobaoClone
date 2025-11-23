@@ -14,14 +14,13 @@ data class LoginRequest(val email: String, val password: String)
 data class LoginResponse(val token: String)
 data class AddToCartRequest(val productId: Int, val quantity: Int)
 data class HistoryEvent(val timestamp: Long, val description: String)
-data class RegisterRequest(val email: String, val password: String) // <-- NEW CLASS
+data class RegisterRequest(val email: String, val password: String)
 
-// --- LIVE RENDER URLS ---
-// Make sure these URLs are correct for your Render services
+// --- YOUR LIVE RENDER URLS (NOW CORRECTED) ---
 private const val USER_SERVICE_URL = "https://user-service-677i.onrender.com/"
 private const val PRODUCT_SERVICE_URL = "https://product-service-0v4l.onrender.com/"
 private const val RECOMMENDATION_SERVICE_URL = "https://recommendation-service-ig7f.onrender.com/"
-private const val CART_SERVICE_URL = "https://cart-service.onrender.com/" // <-- Make sure this URL is correct
+private const val CART_SERVICE_URL = "https://cart-service-y16i.onrender.com/" // <-- THE CORRECT URL
 private const val BLOCKCHAIN_SERVICE_URL = "http://10.0.2.2:8084/" // Connects to local Ganache
 
 // --- Retrofit Instances ---
@@ -36,8 +35,7 @@ interface ApiService {
     // --- User Service ---
     @POST("login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
-
-    @POST("register") // <-- NEW FUNCTION
+    @POST("register")
     suspend fun register(@Body request: RegisterRequest): Response<Unit>
 
     // --- Product Service ---
@@ -51,8 +49,9 @@ interface ApiService {
     suspend fun getRecommendations(@Path("productId") productId: Int): List<Product>
 
     // --- Cart Service ---
+    // --- Cart Service ---
     @GET("cart")
-    suspend fun getCart(@Header("Authorization") token: String): Response<List<Product>>
+    suspend fun getCart(@Header("Authorization") token: String): Response<List<CartItem>> // Changed from Product to CartItem
     @POST("cart")
     suspend fun addToCart(@Header("Authorization") token: String, @Body request: AddToCartRequest): Response<Unit>
 

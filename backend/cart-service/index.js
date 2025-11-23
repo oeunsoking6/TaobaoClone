@@ -14,6 +14,7 @@ const CartItemSchema = new mongoose.Schema({
   quantity: { type: Number, required: true, default: 1 },
   name: String,
   price: Number,
+  image: String,
 });
 const CartSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true },

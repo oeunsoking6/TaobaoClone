@@ -1,12 +1,12 @@
 package com.group4.taobaoclon
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
@@ -18,7 +18,9 @@ class RegisterActivity : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
+        val loginTextView = findViewById<TextView>(R.id.loginTextView) // New Login Link
 
+        // Handle Register Button Click
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
@@ -32,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
 
                         if (response.isSuccessful) {
                             Toast.makeText(this@RegisterActivity, "Registration Successful! Please log in.", Toast.LENGTH_LONG).show()
-                            // Send user back to the login screen
+                            // Close this screen and go back to Login
                             finish()
                         } else {
                             Log.e("RegisterActivity", "Registration failed: ${response.errorBody()?.string()}")
@@ -46,6 +48,12 @@ class RegisterActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // Handle "Already have an account? Login" Click
+        loginTextView.setOnClickListener {
+            // Just close this activity to go back to the Login Screen
+            finish()
         }
     }
 }

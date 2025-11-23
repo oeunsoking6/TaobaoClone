@@ -1,69 +1,56 @@
 package com.group4.taobaoclon
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.launch
+import androidx.fragment.app.Fragment
+import com.group4.taobaoclon.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var productRecyclerView: RecyclerView
-    private lateinit var adapter: ProductAdapter
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        Log.d("MainActivity", "onCreate: Activity starting.")
-
-        productRecyclerView = findViewById(R.id.productRecyclerView)
-        productRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        lifecycleScope.launch {
-            Log.d("MainActivity", "onCreate: Coroutine launched, starting to fetch products.")
-            fetchProductsAndRecommendations()
+        // Load HomeFragment by default
+        if (savedInstanceState == null) {
+            loadFragment(HomeFragment())
         }
-    }
 
-    private suspend fun fetchProductsAndRecommendations() {
-        try {
-            Log.d("MainActivity", "fetchProducts: Calling productApiService.getProducts()")
-            val productList = ApiClient.productApiService.getProducts()
-            Log.d("MainActivity", "fetchProducts: Received ${productList.size} products.")
-
-            if (productList.isNotEmpty()) {
-                adapter = ProductAdapter(productList) { product ->
-                    val intent = Intent(this, ProductDetailActivity::class.java)
-                    intent.putExtra("PRODUCT_ID", product.id)
-                    startActivity(intent)
+        // Set up the bottom navigation
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    loadFragment(HomeFragment())
+                    true
                 }
-                productRecyclerView.adapter = adapter
-                Log.d("MainActivity", "fetchProducts: Adapter set with products.")
-
-                val firstProductId = productList[0].id
-                fetchRecommendations(firstProductId)
-            } else {
-                Log.d("MainActivity", "fetchProducts: Product list is empty.")
+                R.id.nav_categories -> {
+                    loadFragment(CategoryFragment())
+                    true // <--- THIS WAS MISSING
+                }
+                R.id.nav_scan -> {
+                    Toast.makeText(this, "Scan clicked", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                R.id.nav_cart -> {
+                    loadFragment(CartFragment())
+                    true
+                }
+                R.id.nav_profile -> {
+                    loadFragment(ProfileFragment())
+                    true
+                }
+                else -> false
             }
-
-        } catch (e: Exception) {
-            // This is the most important log to check
-            Log.e("MainActivity", "Error fetching products: ${e.message}", e)
         }
     }
 
-    private suspend fun fetchRecommendations(productId: Int) {
-        try {
-            Log.d("MainActivity", "fetchRecs: Calling getRecommendations for product ID $productId")
-            val recommendedProducts = ApiClient.recommendationApiService.getRecommendations(productId)
-            Log.d("MainActivity", "fetchRecs: Found ${recommendedProducts.size} recommendations.")
-        } catch (e: Exception) {
-            Log.e("MainActivity", "Error fetching recommendations: ${e.message}", e)
-        }
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 }

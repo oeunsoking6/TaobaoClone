@@ -12,6 +12,7 @@ import java.util.Locale
 class HistoryAdapter(private val historyEvents: List<HistoryEvent>) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        // We use built-in Android IDs text1 and text2 because we are using a built-in layout
         val descriptionTextView: TextView = view.findViewById(android.R.id.text1)
         val timestampTextView: TextView = view.findViewById(android.R.id.text2)
     }
@@ -32,7 +33,7 @@ class HistoryAdapter(private val historyEvents: List<HistoryEvent>) : RecyclerVi
     override fun getItemCount() = historyEvents.size
 
     private fun formatTimestamp(timestamp: Long): String {
-        // The blockchain timestamp is in seconds, so multiply by 1000
+        // The blockchain timestamp is in seconds, so multiply by 1000 to get milliseconds
         val date = Date(timestamp * 1000)
         val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         return format.format(date)
