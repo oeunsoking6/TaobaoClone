@@ -139,42 +139,93 @@
         android:elevation="16dp"
         android:gravity="center_vertical">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_today"
-            app:tint="#666666"
-            android:layout_marginEnd="20dp"/>
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/ic_menu_call"
-            app:tint="#666666"
-            android:layout_marginEnd="20dp"/>
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@android:drawable/btn_star"
-            app:tint="#666666"
-            android:layout_marginEnd="20dp"/>
+        <LinearLayout
+            android:id="@+id/storeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_today"
+                app:tint="#666666"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Store"
+                android:textSize="10sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/chatButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_share"
+                app:tint="#666666"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
+                android:textSize="10sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wishlistButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/btn_star"
+                app:tint="#666666"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fav"
+                android:textSize="10sp"
+                android:textColor="#555555"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/addToCartButton"
             android:layout_width="0dp"
             android:layout_height="44dp"
-            android:layout_weight="1"
+            android:layout_weight="2.5"
             android:text="Add to Cart"
             android:textSize="12sp"
             android:backgroundTint="#FF9800"
             android:textColor="#FFFFFF"
             app:cornerRadius="22dp"
+            android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"/>
 
         <Button
             android:id="@+id/buyNowButton"
             android:layout_width="0dp"
             android:layout_height="44dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:text="Buy Now"
             android:textSize="12sp"
             android:backgroundTint="#FF5000"
@@ -182,5 +233,4 @@
             app:cornerRadius="22dp"/>
 
     </LinearLayout>
-
 </RelativeLayout>

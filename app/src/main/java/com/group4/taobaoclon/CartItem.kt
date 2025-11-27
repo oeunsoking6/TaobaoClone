@@ -5,5 +5,10 @@ data class CartItem(
     val name: String,
     val price: Double,
     val quantity: Int,
-    val image: String? = null // Added image URL property
+    val image: String? = null,
+    // --- NEW FIELDS ---
+    val variant: String? = "Default",
+    val storeName: String? = "Official Store",
+    val coupons: List<String>? = emptyList(),
+    val shippingLabel: String? = "Free Shipping"
 )

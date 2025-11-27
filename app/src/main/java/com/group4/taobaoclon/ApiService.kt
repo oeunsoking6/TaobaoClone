@@ -49,11 +49,14 @@ interface ApiService {
     suspend fun getRecommendations(@Path("productId") productId: Int): List<Product>
 
     // --- Cart Service ---
-    // --- Cart Service ---
     @GET("cart")
-    suspend fun getCart(@Header("Authorization") token: String): Response<List<CartItem>> // Changed from Product to CartItem
+    suspend fun getCart(@Header("Authorization") token: String): Response<List<CartItem>>
+
     @POST("cart")
     suspend fun addToCart(@Header("Authorization") token: String, @Body request: AddToCartRequest): Response<Unit>
+
+    @retrofit2.http.HTTP(method = "DELETE", path = "cart", hasBody = true)
+    suspend fun removeCartItem(@Header("Authorization") token: String, @Body request: AddToCartRequest): Response<Unit>
 
     // --- Blockchain Service ---
     @GET("history/{productId}")

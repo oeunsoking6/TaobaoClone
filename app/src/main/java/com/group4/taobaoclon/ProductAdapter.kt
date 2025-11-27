@@ -28,23 +28,21 @@ class ProductAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val product = products[position]
 
-        // Set Text
         holder.nameTextView.text = product.name
         holder.priceTextView.text = "$${product.price}"
 
-        // --- ASSIGN DIFFERENT IMAGES BASED ON PRODUCT ID ---
+        // --- Logic to show different images based on Product ID ---
         val imageUrl = when (product.id) {
-            1 -> "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500" // Smartphone
-            2 -> "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500" // Earbuds
-            3 -> "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" // Smartwatch
-            else -> "https://via.placeholder.com/300" // Default for others
+            1 -> "https://i.pinimg.com/1200x/e9/9f/d3/e99fd3881d16ea75b2ca0d5283536a02.jpg" // Smartphone
+            2 -> "https://i.pinimg.com/736x/e1/ba/c3/e1bac38b6c7f361a10c480ae9b57fcd0.jpg" // Earbuds
+            3 -> "https://i.pinimg.com/1200x/f9/e5/88/f9e5889fa2fc666b2f4b272726ad1778.jpg" // Smartwatch
+            else -> "https://via.placeholder.com/300"
         }
 
-        // Load the specific image
         Glide.with(holder.itemView.context)
             .load(imageUrl)
             .centerCrop()
-            .placeholder(R.drawable.banner_home) // Show banner while loading
+            .placeholder(R.drawable.banner_home)
             .into(holder.productImage)
 
         holder.itemView.setOnClickListener {

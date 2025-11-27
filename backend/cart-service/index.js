@@ -15,6 +15,12 @@ const CartItemSchema = new mongoose.Schema({
   name: String,
   price: Number,
   image: String,
+
+  variant: String,        // e.g., "Color: Red; Size: S"
+  storeName: String,      // e.g., "Apple Store From RPC"
+  discountLabel: String,  // e.g., "Discounted price"
+  coupons: [String],      // e.g., ["Buy 1 get 2% off", "$2 off over 20"]
+  shippingLabel: String   // e.g., "Free shipping Local returns"
 });
 const CartSchema = new mongoose.Schema({
   userId: { type: String, required: true, unique: true },
