@@ -17,6 +17,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".OrdersActivity"
+            android:exported="false" />
+        <activity
             android:name=".CheckoutActivity"
             android:exported="false" />
         <activity
@@ -40,6 +43,8 @@
         <activity
             android:name=".HistoryActivity"
             android:exported="false" />
+        <activity
+            android:name=".AddHistoryActivity" />
     </application>
 
 </manifest>

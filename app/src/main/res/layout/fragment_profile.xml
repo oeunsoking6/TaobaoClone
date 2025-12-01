@@ -68,20 +68,22 @@
                     android:layout_marginStart="16dp">
 
                     <TextView
+                        android:id="@+id/tvUserRole"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hey, what should we call you?"
-                        android:textSize="10sp"
+                        android:text="Role: Loading..."
+                        android:textSize="12sp"
                         android:textColor="#666666"
                         android:background="#FFFFFF"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="2dp"/>
 
                     <TextView
+                        android:id="@+id/tvUserId"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Long Seakleng"
-                        android:textSize="20sp"
+                        android:text="User ID"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="4dp"/>

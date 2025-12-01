@@ -93,7 +93,7 @@ class ProductDetailActivity : AppCompatActivity() {
     private fun setupButtons() {
         // Add to Cart Logic
         binding.addToCartButton.setOnClickListener {
-            val sharedPrefs = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+            val sharedPrefs = getSharedPreferences("AppPrefs", MODE_PRIVATE)
             val token = sharedPrefs.getString("USER_TOKEN", null)
 
             if (token == null) {

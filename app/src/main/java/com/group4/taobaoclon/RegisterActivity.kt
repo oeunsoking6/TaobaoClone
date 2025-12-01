@@ -1,5 +1,6 @@
 package com.group4.taobaoclon
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -18,9 +19,8 @@ class RegisterActivity : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.emailEditText)
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
-        val loginTextView = findViewById<TextView>(R.id.loginTextView) // New Login Link
+        val loginTextView = findViewById<TextView>(R.id.loginTextView)
 
-        // Handle Register Button Click
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
@@ -29,12 +29,25 @@ class RegisterActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     try {
                         val request = RegisterRequest(email, password)
-                        // Make sure your user-service is deployed and "awake"
                         val response = ApiClient.userApiService.register(request)
 
-                        if (response.isSuccessful) {
-                            Toast.makeText(this@RegisterActivity, "Registration Successful! Please log in.", Toast.LENGTH_LONG).show()
-                            // Close this screen and go back to Login
+                        if (response.isSuccessful && response.body() != null) {
+                            val responseData = response.body()!!
+                            val assignedRole = responseData.user.role // Backend decides (ADMIN vs USER)
+
+                            // --- CRITICAL FIX: Use "TaobaoStore" ---
+                            val sharedPrefs = getSharedPreferences("TaobaoStore", MODE_PRIVATE)
+                            with(sharedPrefs.edit()) {
+                                putString("USER_ID", responseData.user.id)
+                                putString("ROLE", assignedRole)
+                                apply()
+                            }
+
+                            Toast.makeText(this@RegisterActivity, "Registered as $assignedRole! Please Log In.", Toast.LENGTH_LONG).show()
+
+                            // Go to Login Screen
+                            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                            startActivity(intent)
                             finish()
                         } else {
                             Log.e("RegisterActivity", "Registration failed: ${response.errorBody()?.string()}")
@@ -50,9 +63,7 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Handle "Already have an account? Login" Click
         loginTextView.setOnClickListener {
-            // Just close this activity to go back to the Login Screen
             finish()
         }
     }
