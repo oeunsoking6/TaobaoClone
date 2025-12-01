@@ -9,8 +9,13 @@ app.use(express.json());
 
 // --- Blockchain Connection ---
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
-const contractAddress = "0xe2ac0181bfBa27A4185f161B65e2B3a3024B69b0"; 
-const GANACHE_PRIVATE_KEY = "0xdfbdb3a7c1b171523e361922717cf02e9032b3add23736f0825f99802ac1e9e7";
+const contractAddress = "0xD02179D16B1f0A95342c227B8282d38A46B1D911";
+const GANACHE_PRIVATE_KEY = "0x0282a5aa15f76544284e32eba65d83ce30b013efcee1881f35ac87c69d8832cc"; // Your key
+// ADD THESE LOGS TO DEBUG:
+console.log("------------------------------------------------");
+console.log("DEBUG: Connecting to Provider -> http://127.0.0.1:7545"); 
+console.log("DEBUG: Using Contract Address ->", contractAddress);
+console.log("------------------------------------------------");
 
 const contract = new ethers.Contract(contractAddress, contractABI, provider);
 const signer = new ethers.Wallet(GANACHE_PRIVATE_KEY, provider);
@@ -57,6 +62,7 @@ app.post('/history', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-  console.log(`Blockchain service listening on port ${PORT}`);
+// The '0.0.0.0' argument is critical. It allows connections from the emulator.
+app.listen(8084, '0.0.0.0', () => {
+    console.log('Blockchain service running on port 8084 (Accessible externally)');
 });
